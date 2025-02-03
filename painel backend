@@ -1,0 +1,112 @@
+# Criando o backend com Laravel
+
+# Passos para iniciar o projeto Laravel
+
+1. **Instalar Laravel**
+   ```sh
+   composer create-project --prefer-dist laravel/laravel painel-iptv
+   ```
+
+2. **Configurar o banco de dados**
+   - No arquivo `.env`, definir as credenciais do banco:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=painel_iptv
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+3. **Criar Models e Migrations**
+   ```sh
+   php artisan make:model User -m
+   php artisan make:model Servidor -m
+   php artisan make:model Cliente -m
+   php artisan make:model Pacote -m
+   php artisan make:model Assinatura -m
+   php artisan make:model Transacao -m
+   php artisan make:model Log -m
+   ```
+
+4. **Definir as migrations**
+   - Dentro de `database/migrations/`, adicionar a estrutura de cada tabela baseada no SQL criado.
+
+5. **Rodar as migrations**
+   ```sh
+   php artisan migrate
+   ```
+
+6. **Criar Controllers**
+   ```sh
+   php artisan make:controller UserController --api
+   php artisan make:controller ServidorController --api
+   php artisan make:controller ClienteController --api
+   php artisan make:controller PacoteController --api
+   php artisan make:controller AssinaturaController --api
+   php artisan make:controller TransacaoController --api
+   php artisan make:controller LogController --api
+   ```
+
+7. **Configurar rotas no `routes/api.php`**
+   ```php
+   use App\Http\Controllers\UserController;
+   use App\Http\Controllers\ServidorController;
+   use App\Http\Controllers\ClienteController;
+   use App\Http\Controllers\PacoteController;
+   use App\Http\Controllers\AssinaturaController;
+   use App\Http\Controllers\TransacaoController;
+   use App\Http\Controllers\LogController;
+
+   Route::apiResource('/users', UserController::class);
+   Route::apiResource('/servidores', ServidorController::class);
+   Route::apiResource('/clientes', ClienteController::class);
+   Route::apiResource('/pacotes', PacoteController::class);
+   Route::apiResource('/assinaturas', AssinaturaController::class);
+   Route::apiResource('/transacoes', TransacaoController::class);
+   Route::apiResource('/logs', LogController::class);
+   ```
+
+8. **Gerenciamento de Logs do Sistema**
+   - Implementar `LogController.php`:
+   ```php
+   namespace App\Http\Controllers;
+
+   use Illuminate\Http\Request;
+   use App\Models\Log;
+
+   class LogController extends Controller {
+       public function index() {
+           return response()->json(Log::all());
+       }
+
+       public function store(Request $request) {
+           $log = Log::create($request->all());
+           return response()->json($log, 201);
+       }
+
+       public function show($id) {
+           return response()->json(Log::findOrFail($id));
+       }
+
+       public function update(Request $request, $id) {
+           $log = Log::findOrFail($id);
+           $log->update($request->all());
+           return response()->json($log);
+       }
+
+       public function destroy($id) {
+           Log::findOrFail($id)->delete();
+           return response()->json(['message' => 'Log removido com sucesso']);
+       }
+   }
+   ```
+
+   - Adicionar rotas para logs:
+   ```php
+   Route::middleware('role:admin')->group(function () {
+       Route::apiResource('/logs', LogController::class);
+   });
+   ```
+
+Agora o painel suporta gerenciamento de logs do sistema, permitindo registrar e monitorar atividades administrativas! 📊🚀
