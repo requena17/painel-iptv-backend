@@ -1,6 +1,0 @@
-{
-  "name": "painel-iptv-backend",
-  "require": {
-    "laravel/framework": "^9.0"
-  }
-}
